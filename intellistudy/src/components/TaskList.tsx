@@ -1,32 +1,65 @@
-import { useState } from 'react'
+import { useState } from "react";
+import styles from "../styles/StudyPlanner.module.css";
 
-export default function TaskList() {
-  const [tasks, setTasks] = useState([
-    { text: 'Read Chapter 3', done: false },
-    { text: 'Review Notes', done: false },
-    { text: 'Watch Lecture 5', done: false },
-  ])
+interface StudyTask {
+  id: string;
+  subject: string;
+  topic: string;
+  deadline: string;
+}
 
-  const toggleTask = (index: number) => {
-    const updated = [...tasks]
-    updated[index].done = !updated[index].done
-    setTasks(updated)
-  }
+export default function StudyPlanner({ user }: { user: any }) {
+  const [tasks, setTasks] = useState<StudyTask[]>([]);
+  const [subject, setSubject] = useState("");
+  const [topic, setTopic] = useState("");
+  const [deadline, setDeadline] = useState("");
+
+  const handleAddTask = () => {
+    const newTask = {
+      id: Date.now().toString(),
+      subject,
+      topic,
+      deadline,
+    };
+    setTasks((prev) => [...prev, newTask]);
+    // In future: Save to Firebase under user's UID
+  };
 
   return (
-    <ul className="space-y-2">
-      {tasks.map((task, i) => (
-        <li key={i} className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={task.done}
-            onChange={() => toggleTask(i)}
-          />
-          <span className={task.done ? 'line-through text-gray-500' : ''}>
-            {task.text}
-          </span>
-        </li>
-      ))}
-    </ul>
-  )
+    <div className={styles.container}>
+      <h2>Study Planner</h2>
+
+      <div className={styles.form}>
+        <input
+          className="input"
+          placeholder="Subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        />
+        <input
+          className="input"
+          placeholder="Topic"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+        />
+        <input
+          className="input"
+          type="date"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+        />
+        <button className="button" onClick={handleAddTask}>
+          Add Task
+        </button>
+      </div>
+
+      <ul className={styles.taskList}>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <strong>{task.subject}</strong>: {task.topic} (Due {task.deadline})
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
